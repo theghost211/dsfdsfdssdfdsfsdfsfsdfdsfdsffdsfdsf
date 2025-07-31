@@ -1,0 +1,207 @@
+
+import random
+import string
+import json
+from datetime import datetime
+from colorama import Fore, Style, init
+
+# تهيئة الألوان
+init()
+
+# الألوان
+RED = Fore.RED
+GREEN = Fore.GREEN
+YELLOW = Fore.YELLOW
+BLUE = Fore.BLUE
+MAGENTA = Fore.MAGENTA
+CYAN = Fore.CYAN
+WHITE = Fore.WHITE
+RESET = Style.RESET_ALL
+
+def print_banner():
+    banner = f"""
+{CYAN}╔══════════════════════════════════════════════════════════╗
+║                  {WHITE}💬 DISCORD 4-CHAR USERNAME GENERATOR 💬{CYAN}           ║
+║                       {GREEN}مولد يوزرات ديسكورد رباعية{CYAN}                     ║
+╚══════════════════════════════════════════════════════════╝{RESET}
+"""
+    print(banner)
+
+def generate_4char_username():
+    """توليد يوزر ديسكورد رباعي عشوائي"""
+
+    # أنماط مختلفة لليوزرات الرباعية
+    patterns = [
+        # 4 أحرف فقط
+        lambda: ''.join(random.choices(string.ascii_lowercase, k=4)),
+        lambda: ''.join(random.choices(string.ascii_uppercase, k=4)),
+
+        # مزيج أحرف كبيرة وصغيرة
+        lambda: ''.join(random.choices(string.ascii_letters, k=4)),
+
+        # 4 أرقام فقط
+        lambda: ''.join(random.choices(string.digits, k=4)),
+
+        # 3 أحرف + رقم
+        lambda: ''.join(random.choices(string.ascii_lowercase, k=3)) + random.choice(string.digits),
+        lambda: ''.join(random.choices(string.ascii_uppercase, k=3)) + random.choice(string.digits),
+
+        # رقم + 3 أحرف
+        lambda: random.choice(string.digits) + ''.join(random.choices(string.ascii_lowercase, k=3)),
+        lambda: random.choice(string.digits) + ''.join(random.choices(string.ascii_uppercase, k=3)),
+
+        # 2 أحرف + 2 أرقام
+        lambda: ''.join(random.choices(string.ascii_lowercase, k=2)) + ''.join(random.choices(string.digits, k=2)),
+        lambda: ''.join(random.choices(string.ascii_uppercase, k=2)) + ''.join(random.choices(string.digits, k=2)),
+
+        # 2 أرقام + 2 أحرف
+        lambda: ''.join(random.choices(string.digits, k=2)) + ''.join(random.choices(string.ascii_lowercase, k=2)),
+        lambda: ''.join(random.choices(string.digits, k=2)) + ''.join(random.choices(string.ascii_uppercase, k=2)),
+
+        # مزيج عشوائي من الأحرف والأرقام
+        lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=4)),
+
+        # أحرف مميزة
+        lambda: ''.join(random.choices('aeiou', k=2)) + ''.join(random.choices('bcdfghjklmnpqrstvwxyz', k=2)),
+        lambda: ''.join(random.choices('bcdfghjklmnpqrstvwxyz', k=2)) + ''.join(random.choices('aeiou', k=2)),
+    ]
+
+    return random.choice(patterns)()
+
+def check_username_quality(username):
+    """تقييم جودة اليوزر"""
+    score = 0
+    quality = ""
+
+    # يحتوي على أحرف فقط
+    if username.isalpha():
+        score += 2
+
+    # يحتوي على أرقام فقط
+    elif username.isdigit():
+        score += 1
+
+    # مزيج أحرف وأرقام
+    elif username.isalnum():
+        score += 3
+
+    # يحتوي على حروف متحركة
+    vowels = 'aeiouAEIOU'
+    if any(c in vowels for c in username):
+        score += 1
+
+    # سهل النطق
+    if len([c for c in username if c in vowels]) >= 1:
+        score += 1
+
+    # تحديد الجودة
+    if score >= 5:
+        quality = f"{GREEN}ممتاز ⭐⭐⭐{RESET}"
+    elif score >= 3:
+        quality = f"{YELLOW}جيد ⭐⭐{RESET}"
+    else:
+        quality = f"{RED}عادي ⭐{RESET}"
+
+    return quality
+
+def save_usernames(usernames):
+    """حفظ اليوزرات في ملف"""
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"discord_4char_usernames_{timestamp}.txt"
+
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write("💬 DISCORD 4-CHARACTER USERNAMES 💬\n")
+        f.write("=" * 50 + "\n\n")
+
+        excellent_count = 0
+        good_count = 0
+        normal_count = 0
+
+        for i, username_data in enumerate(usernames, 1):
+            username = username_data['username']
+            quality = username_data['quality']
+            f.write(f"{i:3d}. {username:<8} | {quality}\n")
+
+            if "ممتاز" in quality:
+                excellent_count += 1
+            elif "جيد" in quality:
+                good_count += 1
+            else:
+                normal_count += 1
+
+        f.write("\n" + "=" * 50 + "\n")
+        f.write("📊 إحصائيات الجودة:\n")
+        f.write(f"   • ممتاز: {excellent_count}\n")
+        f.write(f"   • جيد: {good_count}\n")
+        f.write(f"   • عادي: {normal_count}\n")
+        f.write(f"\nتم التوليد في: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+    return filename, excellent_count, good_count, normal_count
+
+def main():
+    print_banner()
+
+    try:
+        print(f"{YELLOW}كم عدد اليوزرات الرباعية التي تريد توليدها؟{RESET}")
+        count = int(input(f"{GREEN}> {RESET}"))
+
+        if count <= 0 or count > 10000000000000:
+            print(f"{RED}❌ يرجى إدخال عدد بين 1 و 10000000000000 {RESET}")
+            return
+
+        print(f"\n{BLUE}🔄 جاري توليد {count} يوزر رباعي...{RESET}\n")
+
+        usernames = []
+
+        for i in range(count):
+            username = generate_4char_username()
+            quality = check_username_quality(username)
+
+            usernames.append({
+                'username': username,
+                'quality': quality
+            })
+
+            # عرض النتيجة
+            print(f"{GREEN}✅ {i+1:4d}. {WHITE}{username:<8} {CYAN}| {quality}")
+
+        # حفظ النتائج
+        filename, excellent_count, good_count, normal_count = save_usernames(usernames)
+
+        print(f"\n{GREEN}✅ تم حفظ اليوزرات في: {filename}{RESET}")
+        print(f"{YELLOW}💡 نصيحة: تأكد من توفر اليوزر على ديسكورد قبل الاستخدام{RESET}")
+
+        # إحصائيات مفصلة
+        print(f"\n{MAGENTA}📊 الإحصائيات التفصيلية:{RESET}")
+        print(f"   • إجمالي اليوزرات: {count}")
+        print(f"   • يوزرات ممتازة: {excellent_count} ({excellent_count/count*100:.1f}%)")
+        print(f"   • يوزرات جيدة: {good_count} ({good_count/count*100:.1f}%)")
+        print(f"   • يوزرات عادية: {normal_count} ({normal_count/count*100:.1f}%)")
+        print(f"   • الوقت: {datetime.now().strftime('%H:%M:%S')}")
+        print(f"   • التاريخ: {datetime.now().strftime('%Y-%m-%d')}")
+
+        # عرض أفضل اليوزرات
+        excellent_usernames = [u for u in usernames if "ممتاز" in u['quality']]
+        if excellent_usernames:
+            print(f"\n{GREEN}🏆 أفضل اليوزرات الممتازة:{RESET}")
+            for i, username_data in enumerate(excellent_usernames[:10], 1):
+                print(f"   {i}. {username_data['username']}")
+
+        # خيارات إضافية
+        print(f"\n{CYAN}هل تريد توليد المزيد؟ (y/n){RESET}")
+        choice = input(f"{GREEN}> {RESET}").lower()
+
+        if choice in ['y', 'yes', 'نعم', 'ن']:
+            main()
+        else:
+            print(f"{BLUE}💬 شكراً لاستخدام مولد يوزرات ديسكورد الرباعية! 💬{RESET}")
+
+    except ValueError:
+        print(f"{RED}❌ يرجى إدخال رقم صحيح!{RESET}")
+    except KeyboardInterrupt:
+        print(f"\n{YELLOW}⚠️ تم إيقاف البرنامج{RESET}")
+    except Exception as e:
+        print(f"{RED}❌ حدث خطأ: {e}{RESET}")
+
+if __name__ == "__main__":
+    main()
