@@ -16,7 +16,7 @@ def run():
 def keep_alive():
     Thread(target=run).start()
 
-TOKEN = "MTM4NjEwNDIzMDk1MDk5ODA0Nw.GANVgK.2cnfQfW-MTqHLHVIs88esv6P3PxAI0NWPMCEG0"
+TOKEN = "MTM4NjEwNDIzMDk1MDk5ODA0Nw.GsqQwq.qaMi7SJZ7W5IcI3MHhK0c59uMcN7hiewQx0LL4"
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 tree = bot.tree
